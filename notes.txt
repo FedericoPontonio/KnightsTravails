@@ -1,16 +1,4 @@
-Function that stores values in 2d arrays. It may not be useful after all.
+The error doesn't get thrown properly with the current log setup.
+The error handling could be more comprehensive, such as including the case of omitting coordinates.
 
-function adjacencyList(i = null,j = null) {
-    let rowsArray = [];
-    for (let x = 0; x < 8; x++) {
-        let columnsArray = [];
-        for (let y = 0; y<8;y++) {
-            if(x== i && y==j){}
-            else {
-                columnsArray.push(possibleMoves(x,y)) 
-            }
-        }
-        rowsArray.push(columnsArray)
-    }
-    return rowsArray
-};
+The return of the knightMoves function could be set to be more convenient for different kind visualisation. One way could be setting up a variable with the returned object, so it can be manipulated without the need to be processed more than one time.

@@ -24,10 +24,24 @@ function possibleMoves(x,y) {
     }
     return possibleMoves
 };
-// console.log(possibleMoves(1,5))
+//throw error if input is out of range
+function isInputOutOfRange(start, end){
+    if (
+        start[0] < 0 || start[0] > 7 ||
+        start[1] < 0 || start[1] > 7 ||
+        end[0] < 0 || end[0] > 7 ||
+        end[1] < 0 || end[1] > 7
+    ) {
+        return true
+    }
+};
 
-function knightMoves(start, end, recordArray=[], counter=0) {
-    let record = [...recordArray, start];//serve?
+function knightMoves(start, end, recordArray=[], counter=0, queue=[]) {
+    if(isInputOutOfRange(start,end)) {
+        return 'Be careful! You must insert values between 0 and 7'
+    }
+    let record = [...recordArray, start];
+    queue.shift();//è giusto qui? quando voglio rimuoverlo?
     let possible_moves = possibleMoves(start[0],start[1]);
     //remove record elements from possible_moves
     for (let i = 0; i< possible_moves.length;i++) {//iterate through possible_moves
@@ -55,18 +69,42 @@ function knightMoves(start, end, recordArray=[], counter=0) {
     //recursion case
     else {
         let externalRecord = [];
-        for (let i = 0; i< possible_moves.length; i++) {
-                externalRecord.push(knightMoves(possible_moves[i], end, record, counter+1));
+        //add to queue possible moves followed by their record
+        for (let i = 0; i<possible_moves.length;i++) {
+            queue.push([possible_moves[i],record])
+        }
+        //add 0 at end of queue population as placeholder
+        queue.push([0, null]);
+        //if placeholder is reached, check if there has been any result
+        if(queue[0][0]==0) {
+            //if there are any result, force exit from loop and process results
+            if (externalRecord.length>0) {
+                let result = externalRecord[0];
+                for (let i = 1; i<externalRecord.length;i++) {
+                    if(externalRecord[i].counter < result.counter) {
+                        result = externalRecord[i];
+                    }
+                }
+                return result.record    //does it do anything?
             }
-        
-        let result = externalRecord[0];
-        for (let i = 1; i<externalRecord.length;i++) {
-            if(externalRecord[i].counter < result.counter) {
-                result = externalRecord[i];
+            else {
+                queue.shift();          //this defintly does
             }
         }
-        return result.record
+        externalRecord.push(knightMoves(queue[0][0], end, queue[0][1], counter+1, queue));
+        let result = externalRecord[0];
+                for (let i = 1; i<externalRecord.length;i++) {
+                    if(externalRecord[i].counter < result.counter) {
+                        result = externalRecord[i];
+                    }
+                }
+                return result
     }
-}
-
-console.log(knightMoves([0,7],[0,5]));
+};
+console.log(
+    '%c the knight travelled through ' +
+    knightMoves([7,4],[7,5]).record.length +
+    ' cells to reach his destination.' +
+    'The cells traversed are: ','color:lime;background:black;'
+);
+console.table(knightMoves([7,7],[7,5]).record);
