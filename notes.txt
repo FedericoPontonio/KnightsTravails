@@ -1,0 +1,16 @@
+Function that stores values in 2d arrays. It may not be useful after all.
+
+function adjacencyList(i = null,j = null) {
+    let rowsArray = [];
+    for (let x = 0; x < 8; x++) {
+        let columnsArray = [];
+        for (let y = 0; y<8;y++) {
+            if(x== i && y==j){}
+            else {
+                columnsArray.push(possibleMoves(x,y)) 
+            }
+        }
+        rowsArray.push(columnsArray)
+    }
+    return rowsArray
+};

@@ -1,5 +1,5 @@
 //create unfiltered values
-function knightMovement (x, y){
+function moveSet (x, y){
     const tempArray = [
     [x+2,y+1],
     [x+2,y-1],
@@ -15,55 +15,58 @@ function knightMovement (x, y){
 //filter out of range values
 function possibleMoves(x,y) {
     let possibleMoves = [];
-    let prefilterMoves = knightMovement(x,y);
+    let prefilterMoves = moveSet(x,y);
     for (let i=0;i<8;i++) {
-        if (prefilterMoves[i][0]>0 && prefilterMoves[i][0]<8 &&
-            prefilterMoves[i][1]>0 && prefilterMoves[i][1]<8){
+        if (prefilterMoves[i][0]>=0 && prefilterMoves[i][0]<8 &&
+            prefilterMoves[i][1]>=0 && prefilterMoves[i][1]<8){
                 possibleMoves.push(prefilterMoves[i])
             }
     }
     return possibleMoves
 };
+// console.log(possibleMoves(1,5))
 
-//store values in 2d arrays
-function adjacencyList(i = null,j = null) {
-    let rowsArray = [];
-    for (let x = 0; x < 8; x++) {
-        let columnsArray = [];
-        for (let y = 0; y<8;y++) {
-            if(x== i && y==j){}
-            else {
-                columnsArray.push(possibleMoves(x,y)) 
-            }
+function knightMoves(start, end, recordArray=[], counter=0) {
+    let record = [...recordArray, start];//serve?
+    let possible_moves = possibleMoves(start[0],start[1]);
+    //remove record elements from possible_moves
+    for (let i = 0; i< possible_moves.length;i++) {//iterate through possible_moves
+        for (let j = 0; j< record.length; j++) {//iterate through record
+            if (record[j][0] == possible_moves[i][0] &&
+                record[j][1] == possible_moves[i][1]) {
+                    possible_moves.splice(i,1);
+                    i--;
+                    break;
+                }
         }
-        rowsArray.push(columnsArray)
     }
-    return rowsArray
-};
-
-// console.log(adjacencyList())
-// console.log(knightMoves([1,2], [4,5]))
-
-function knightMoves(start, end, data, record = []) {
-    console.log(adjacencyList([start[0]][start[1]]))
-
-    let availableMoves = adjacencyList([start[0]][start[1]]);
-    if (start[0] == end[0]&&start[1]==end[1]) {
-        return record
+    //evaluate if end in possible_moves
+    let isEndInPossibleMoves = false;
+    for (let i = 0; i<possible_moves.length;i++) {
+        if (end[0] == possible_moves[i][0] && end[1] == possible_moves[i][1]) {
+            isEndInPossibleMoves = true;
+        }
     }
+    //base case
+    if (isEndInPossibleMoves) {
+        record.push(end);
+        return {counter, record}
+    }
+    //recursion case
     else {
-        let record = [];
-        for (let i = 0; i< availableMoves.length; i++) {
-            record.push({itinerary : availableMoves[i]})
-            return knightMoves(availableMoves[i], end,adjacencyList([start[0]][start[1]]))  )
-
-        }
-        let result= record[0].itinerary;
-        for (let i= 1;i<record.length;i++) {
-            if (record[i].itinerary.length<result.length) {
-                result = record[i].itinerary
+        let externalRecord = [];
+        for (let i = 0; i< possible_moves.length; i++) {
+                externalRecord.push(knightMoves(possible_moves[i], end, record, counter+1));
+            }
+        
+        let result = externalRecord[0];
+        for (let i = 1; i<externalRecord.length;i++) {
+            if(externalRecord[i].counter < result.counter) {
+                result = externalRecord[i];
             }
         }
+        return result.record
     }
 }
 
+console.log(knightMoves([0,7],[0,5]));
